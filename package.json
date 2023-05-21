@@ -1,12 +1,12 @@
 {
-  "name": "technical_assistant",
+  "name": "intractec-backend",
   "version": "1.0.0",
-  "description": "Trabajo practico numero 2.",
+  "description": "Tesis",
   "type": "module",
   "main": "app.js",
   "scripts": {
     "dev": "nodemon app.js",
-    "server": "node app.js",
+    "start": "node app.js",
     "test": "echo \"Error: no test specified\" && exit 1"
   },
   "author": "Argüello Juliián Andrés / Gariglio Sebastian Mariano / Signorini Alessandro Paolo",
