@@ -15,7 +15,6 @@ import template from '../services/mail/template/recovery.js';
  * @param {*} res 
  */
 export function login(req, res) {
-    console.log("login", req.body)
     schemaLogin.validate(req.body)
         .then(async (entity) => {
             const user = await usersDao.findByEmail(entity.email)
