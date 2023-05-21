@@ -1,6 +1,6 @@
 import mongodb from 'mongodb';
 import config from '../config.js';
-const client = new mongodb.MongoClient(`mongodb://${config.db.host}:${config.db.port}`);
+const client = new mongodb.MongoClient(`mongodb+srv://${config.db.host}:${config.db.port}`);
 const db = client.db(config.db.dbName);
 /*-------------------------------------------------------------------------------------------*/
 /**
