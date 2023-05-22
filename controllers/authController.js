@@ -15,9 +15,12 @@ import template from '../services/mail/template/recovery.js';
  * @param {*} res 
  */
 export function login(req, res) {
+    console.log('login controller');
     schemaLogin.validate(req.body)
         .then(async (entity) => {
+            console.log('login controller validate');
             const user = await usersDao.findByEmail(entity.email)
+            console.log('login controller user', user);
             if (user) {
                 if (user.softDelete != 'true') {
                     user.role = await rolesDao.findById(user.role_id)
@@ -25,6 +28,7 @@ export function login(req, res) {
                     if (validate) {
                         delete user.password;
                         const token = jwtService.generate(user)
+                        console.log('login controller token', token);
                         res.header('auth-token', token).json({ user: user, token: token })
                     } else {
                         return res.status(401).json({ err: 401, 'status': 'error', msg: "El password no coincide." })
