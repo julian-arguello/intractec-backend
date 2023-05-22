@@ -11,6 +11,7 @@ const db = client.db(config.db.dbName);
  * @returns 
  */
 export async function conection(callback) {
+    console.log('db', client);
     await client.connect() //Esperamos la conexion.
     const result = await callback(db);
 
