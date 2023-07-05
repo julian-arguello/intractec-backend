@@ -1,16 +1,16 @@
 import nodemailer from 'nodemailer';
 
-const transporter = nodemailer.createTransport({
+const transport = nodemailer.createTransport({
     host: "sandbox.smtp.mailtrap.io",
     port: 2525,
     auth: {
-        user: "2e755bb72e4e76",
-        pass: "125fa03877b024"
+      user: "2e755bb72e4e76",
+      pass: "125fa03877b024"
     }
-});
+  });
 
-export function send (mailOption){
-   return transporter.sendMail(mailOption, (err, info) =>{
+const send = async(mailOption)=>{
+   await transport.sendMail(mailOption, (err, info) =>{
         if(err){
             throw { error: 500, msg: err }
         }
@@ -20,3 +20,4 @@ export function send (mailOption){
 export default {
     send
 }
+
