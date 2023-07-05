@@ -1,11 +1,11 @@
 import nodemailer from 'nodemailer';
 
 const transporter = nodemailer.createTransport({
-    host: 'smtp.ethereal.email',
+    host: "sandbox.smtp.mailtrap.io",
     port: 587,
     auth: {
-        user: 'cayla.farrell@ethereal.email',
-        pass: 'nBYTDqzhn32qvTyfhZ'
+        user: "2e755bb72e4e76",
+        pass: "125fa03877b024"
     }
 });
 
