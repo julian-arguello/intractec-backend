@@ -3,7 +3,7 @@ import rolesDao from '../model/roles.dao.js';
 import jwtService from '../services/jwt.service.js';
 import { schemaLogin, schemaRecovery, schemaNewPassword, schemaUserUpdatePassword } from '../services/validate.js';
 import bcrypt from 'bcrypt';
-import nodemail from '../services/mail/nodemail.js';
+import sendgrid from '../services/mail/sendgrid.js';
 import configMail from '../services/mail/template/configMail.js';
 import template from '../services/mail/template/recovery.js';
 
@@ -54,9 +54,15 @@ export function recovery(req, res) {
             const token = jwtService.generateRecovery({ email: existUser.email, date: d }, true)
             if (existUser) {
                 try {
-                    nodemail.send(configMail(existUser.email, template(existUser.name, token)))
-                    res.status(200).json({ 'status': 'success', msg: 'Email enviado.' });
-
+                    sendgrid.send(configMail(existUser.email, template(existUser.name, token)))
+                    .then(() => {
+                        res.status(200).json({ 'status': 'success', msg: 'Email enviado.' });
+                    })
+                    .catch((err) => {
+                        console.log('[Error] ', err);
+                        res.status(500).json({ error: 500, 'status': 'error', msg: err.msg })
+                    })
+                    
                 } catch (error) {
                     res.status(400).json({ err: 401, 'status': 'error', msg: error })
                 }
