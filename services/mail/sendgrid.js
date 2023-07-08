@@ -30,7 +30,6 @@ sgMail.setApiKey(process.env.SENDGRID_API_KEY);
 
 // Definir función para enviar correo
 const send = async (mailOption) => {
-  console.log(mailOption);
   try {
     // Envía el correo electrónico
     await sgMail.send(mailOption);

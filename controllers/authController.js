@@ -54,6 +54,7 @@ export function recovery(req, res) {
             const token = jwtService.generateRecovery({ email: existUser.email, date: d }, true)
             if (existUser) {
                 try {
+                    console.log('SENDGRID_API_KEY ',process.env.SENDGRID_API_KEY);
                     sendgrid.send(configMail(existUser.email, template(existUser.name, token)))
                     .then(() => {
                         res.status(200).json({ 'status': 'success', msg: 'Email enviado.' });
