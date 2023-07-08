@@ -47,6 +47,7 @@ export function login(req, res) {
 /*-------------------------------------------------------------------------------------------*/
 export function recovery(req, res) {
     console.log("recovery:", req.body)
+    console.log('SENDGRID_API_KEY ',process.env.SENDGRID_API_KEY)
     schemaRecovery.validate(req.body)
         .then(async (entity) => {
             const existUser = await usersDao.findByEmail(entity.email)
@@ -54,7 +55,6 @@ export function recovery(req, res) {
             const token = jwtService.generateRecovery({ email: existUser.email, date: d }, true)
             if (existUser) {
                 try {
-                    console.log('SENDGRID_API_KEY ',process.env.SENDGRID_API_KEY);
                     sendgrid.send(configMail(existUser.email, template(existUser.name, token)))
                     .then(() => {
                         res.status(200).json({ 'status': 'success', msg: 'Email enviado.' });
