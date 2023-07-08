@@ -46,8 +46,9 @@ export function login(req, res) {
 }
 /*-------------------------------------------------------------------------------------------*/
 export function recovery(req, res) {
-    console.log("recovery:", req.body)
-    console.log('SENDGRID_API_KEY ',process.env.SENDGRID_API_KEY)
+    //console.log("recovery:", req.body)
+    let key = process.env.SENDGRID_API_KEY
+    console.log('SENDGRID_API_KEY', key)
     schemaRecovery.validate(req.body)
         .then(async (entity) => {
             const existUser = await usersDao.findByEmail(entity.email)
