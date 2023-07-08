@@ -26,7 +26,7 @@ export default {
 import sgMail from '@sendgrid/mail';
 
 // Establece tu API Key de SendGrid
-sgMail.setApiKey('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');
+sgMail.setApiKey(process.env.SENDGRID_API_KEY);
 
 // Definir función para enviar correo
 const send = async (mailOption) => {
