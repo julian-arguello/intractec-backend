@@ -95,6 +95,15 @@ export const schemaServicesUpdate = yup.object().shape({
     state: yup.string().min(3).required('El estado de reparacion es obligatorio.'),
     client_id: yup.string().min(24).required('El cliente es obligatorio.'),
 }).noUnknown()
+
+export const schemaServicesStatusCreate = yup.object().shape({
+    description: yup.string().min(10).required('La descripcion es obligatoria.'),
+    state: yup.string().required('El estado es obligatorio.').oneOf(['Recepcionado', 'Revisado', 'Reparado', 'Sin reparación', 'Devuelto'], 'Estado no válido.')
+}).noUnknown()
+
+export const schemaServicesStatusDelete = yup.object().shape({
+    state: yup.string().required('El estado a eliminar es obligatorio.').oneOf(['Recepcionado', 'Revisado', 'Reparado', 'Sin reparación', 'Devuelto'], 'Estado no válido.')
+}).noUnknown()
 /*-------------------------------------------------------------------------------------------*/
 /*
 |--------------------------------------------------------------------------
