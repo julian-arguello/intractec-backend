@@ -1,7 +1,6 @@
 import servicesDao from "../model/services.dao.js";
 import clientsDao from "../model/clients.dao.js";
 import UserDao from "../model/users.dao.js";
-import stateDao from "../model/states.dao.js";
 import lastServiceRegister from "../model/lastServiceRegister.dao.js";
 import {
   schemaServicesCreate,
@@ -63,6 +62,7 @@ function viewStatistics(req, res) {
         revisado: 0,
         sin_reparacion: 0,
         reparado: 0,
+        devuelto: 0,
       };
       services.map((service) => {
         switch (service.state) {
@@ -77,6 +77,9 @@ function viewStatistics(req, res) {
             break;
           case "Reparado":
             statistics.reparado += 1;
+            break;
+          case "Devuelto":
+            statistics.devuelto += 1;
             break;
         }
       });
