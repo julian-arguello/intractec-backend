@@ -8,8 +8,8 @@ import { isSuperAdmin } from '../middleware/isSuperAdmin.js';
 const router = express.Router();
 router.route('/estado/:id')
     .post([isAuth], controller.statusCreate)
-    .delete([isAuth], controller.statusDelete);
-    // .patch([isAuth], controller.statusUpdate);
+    .delete([isAuth], controller.statusDelete)
+    .patch([isAuth], controller.statusUpdate);
     
 router.route('/recent/:cant')
     .get([isAuth], controller.viewRecent);

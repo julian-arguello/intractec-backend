@@ -91,8 +91,6 @@ export const schemaServicesUpdate = yup.object().shape({
     model: yup.string().min(3).required('El modelo del equipo es obligatorio.'),
     brand: yup.string().min(2).required('El nombre de la marca es obligatorio.'),
     serial_number: yup.string().min(6).required('El numero de serie es obligatorio.'),
-    description: yup.string().min(10).required('La descripcion es obligatoria.'),
-    state: yup.string().min(3).required('El estado de reparacion es obligatorio.'),
     client_id: yup.string().min(24).required('El cliente es obligatorio.'),
 }).noUnknown()
 
@@ -104,6 +102,16 @@ export const schemaServicesStatusCreate = yup.object().shape({
 export const schemaServicesStatusDelete = yup.object().shape({
     state: yup.string().required('El estado a eliminar es obligatorio.').oneOf(['Recepcionado', 'Revisado', 'Reparado', 'Sin reparación', 'Devuelto'], 'Estado no válido.')
 }).noUnknown()
+
+
+export const schemaServicesStatusUpdate = yup.object().shape({
+    state: yup.string().required('El estado es requerido'),
+    description: yup.string()
+      .max(140, 'La descripción no puede exceder los 140 caracteres')
+      .min(10, 'La descripción debe tener al menos 10 caracteres')
+      .required('La descripción es requerida'),
+    date: yup.date().required('La fecha es requerida'),
+  });
 /*-------------------------------------------------------------------------------------------*/
 /*
 |--------------------------------------------------------------------------

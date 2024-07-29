@@ -7,6 +7,7 @@ import {
   schemaServicesUpdate,
   schemaServicesStatusCreate,
   schemaServicesStatusDelete,
+  schemaServicesStatusUpdate
 } from "../services/validate.js";
 
 /*-------------------------------------------------------------------------------------------*/
@@ -174,7 +175,7 @@ function create(req, res) {
             .then(() => {
               res.status(200).json({
                 status: "success",
-                msg: "El servicio fue creado correctamente.",
+                msg: "El servicio fue creado correctamente."
               });
             })
             .catch((err) => {
@@ -329,7 +330,12 @@ async function statusCreate(req, res) {
 }
 
 /*-------------------------------------------------------------------------------------------*/
-
+/**
+ * 
+ * @param {*} req 
+ * @param {*} res 
+ * @returns 
+ */
 async function statusDelete(req, res) {
   try {
     // Validar la solicitud
@@ -390,8 +396,124 @@ async function statusDelete(req, res) {
 }
 
 /*-------------------------------------------------------------------------------------------*/
+/**
+ * Actualiza el estado de un servicio específico.
+ *
+ * @param {Object} req - El objeto de solicitud de Express.
+ * @param {Object} res - El objeto de respuesta de Express.
+ * @returns {Promise<void>}
+ */
+async function statusUpdate(req, res) {
+  try {
+    const { id } = req.params;
+    const { state, date, description } = await schemaServicesStatusUpdate.validate(req.body);
 
-function statusUpdate(req, res) {}
+    // Buscar el servicio por ID
+    const service = await servicesDao.findById(id);
+    if (!service) {
+      return res.status(404).json({ error: 404, status: "error", msg: "Servicio no encontrado" });
+    }
+
+    // Obtener el orden de los estados desde service.states
+    const stateOrder = Object.keys(service.states);
+    const currentStateIndex = stateOrder.indexOf(state);
+    if (currentStateIndex === -1) {
+      return res.status(400).json({ error: 400, status: "error", msg: "Estado no válido" });
+    }
+
+    // No se permite modificar la fecha de Recepcionado, excepto si la nueva fecha es la misma que la actual (sin segundos)
+    if (state === "Recepcionado") {
+      const currentDate = new Date(service.states[state]?.date);
+      const newDate = new Date(date);
+
+      const formatDateWithoutSeconds = (date) => {
+        const [datePart, timePart] = date.toISOString().split('T');
+        const [hours, minutes] = timePart.split(':');
+        return `${datePart}T${hours}:${minutes}`;
+      };
+
+      const formattedCurrentDate = formatDateWithoutSeconds(currentDate);
+      const formattedNewDate = formatDateWithoutSeconds(newDate);
+
+      console.log("Fecha actual de Recepcionado (sin segundos):", formattedCurrentDate);
+      console.log("Nueva fecha propuesta (sin segundos):", formattedNewDate);
+
+      if (formattedCurrentDate !== formattedNewDate) {
+        return res.status(400).json({ error: 400, status: "error", msg: "No se puede modificar la fecha de Recepcionado, salvo que sea la misma fecha" });
+      }
+      
+      // Si la fecha es la misma, solo actualiza la descripción
+      service.states[state].description = description;
+
+      // Actualizar el servicio en la base de datos
+      await servicesDao.update(id, { states: service.states });
+
+      // Responder con éxito
+      return res.status(200).json({
+        status: "success",
+        msg: "El estado del servicio fue modificado correctamente.",
+      });
+    }
+
+    const previousState = stateOrder[currentStateIndex - 1];
+    const nextState = stateOrder[currentStateIndex + 1];
+
+    const previousStateDate = previousState ? service.states[previousState]?.date : null;
+    const nextStateDate = nextState ? service.states[nextState]?.date : null;
+
+    // Validar que la fecha no sea menor a la del estado anterior
+    if (previousStateDate && new Date(date) < new Date(previousStateDate)) {
+      return res.status(400).json({
+        error: 400,
+        status: "error",
+        msg: `La fecha no puede ser menor a la fecha del estado ${previousState}`,
+      });
+    }
+
+    // Validar que la fecha no sea mayor a la del estado siguiente
+    if (nextStateDate && new Date(date) > new Date(nextStateDate)) {
+      return res.status(400).json({
+        error: 400,
+        status: "error",
+        msg: `La fecha no puede ser mayor a la fecha del estado ${nextState}`,
+      });
+    }
+
+    // Validar que la fecha del estado final (último estado) no sea mayor a la fecha actual
+    if (currentStateIndex === stateOrder.length - 1 && new Date(date) > new Date()) {
+      return res.status(400).json({
+        error: 400,
+        status: "error",
+        msg: "La fecha del estado final no puede ser mayor a la fecha actual",
+      });
+    }
+
+    // Actualizar el estado con la nueva fecha y descripción
+    service.states[state] = {
+      ...service.states[state],
+      date: new Date(date),
+      description,
+    };
+
+    // Actualizar el servicio en la base de datos
+    await servicesDao.update(id, { states: service.states });
+
+    // Responder con éxito
+    res.status(200).json({
+      status: "success",
+      msg: "El estado del servicio fue modificado correctamente.",
+    });
+  } catch (err) {
+    if (err.name === "ValidationError") {
+      res.status(400).json({ error: 400, status: "error", msg: err.errors });
+    } else {
+      console.log("[Error] ", err);
+      res.status(500).json({ error: 500, status: "error", msg: err.message });
+    }
+  }
+}
+
+
 
 /*-------------------------------------------------------------------------------------------*/
 
