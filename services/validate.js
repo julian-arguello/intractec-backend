@@ -147,3 +147,20 @@ export const schemaNewPassword = yup.object().shape({
     token: yup.string().min(10, "link invalido").required("link invalido"),
 }).noUnknown()
 /*-------------------------------------------------------------------------------------------*/
+/*
+|--------------------------------------------------------------------------
+| New password
+|--------------------------------------------------------------------------
+*/
+export const schemaUpdatePassword = yup.object().shape({
+
+        oldPassword: yup.string()
+          .required("La contraseña actual es obligatoria"),
+        newPassword: yup.string()
+          .min(6, "La nueva contraseña debe tener al menos 6 caracteres")
+          .required("La nueva contraseña es obligatoria")
+          .notOneOf([yup.ref('oldPassword'), null], "La nueva contraseña no puede ser igual a la actual")
+
+    /*------------------------------------------------------------*/
+}).noUnknown()
+/*-------------------------------------------------------------------------------------------*/
