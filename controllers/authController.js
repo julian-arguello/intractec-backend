@@ -1,7 +1,7 @@
 import usersDao from '../model/users.dao.js';
 import rolesDao from '../model/roles.dao.js';
 import jwtService from '../services/jwt.service.js';
-import { schemaLogin, schemaRecovery, schemaNewPassword, schemaUserUpdatePassword } from '../services/validate.js';
+import { schemaLogin, schemaRecovery, schemaNewPassword, schemaUserUpdatePassword, schemaUpdatePassword } from '../services/validate.js';
 import bcrypt from 'bcrypt';
 import sendgrid from '../services/mail/sendgrid.js';
 import configMail from '../services/mail/template/configMail.js';
@@ -124,8 +124,51 @@ export function newPass(req, res) {
     })
 }
 /*-------------------------------------------------------------------------------------------*/
+export async function updatePass(req, res) {
+    const token = req.header('auth-token');
+    
+    if (!token) {
+        return res.status(401).json({ error: 401, msg: 'Token de autenticación requerido.' });
+    }
+    
+    try {
+        await schemaUpdatePassword.validate(req.body);
+        
+        // Valida el token JWT
+        const data = await jwtService.validate(token);
+        const user = await usersDao.findByEmail(data.email);
+
+        // Verifica que el usuario exista
+        if (!user) {
+            return res.status(404).json({ error: 404, msg: 'Usuario no encontrado.' });
+        }
+        
+        // Compara la contraseña antigua
+        const isMatch = await bcrypt.compare(req.body.oldPassword, user.password);
+        if (!isMatch) {
+            return res.status(400).json({ error: 400, msg: 'La contraseña actual es incorrecta.' });
+        }
+        
+        // Genera el hash para la nueva contraseña
+        const salt = await bcrypt.genSalt(10);
+        const hashedPassword = await bcrypt.hash(req.body.newPassword, salt);
+        
+        // Actualiza la contraseña del usuario en la base de datos
+        await usersDao.update(user._id.toString(), { password: hashedPassword });
+        
+        res.status(200).json({ status: 'success', msg: 'La contraseña se actualizó exitosamente.' });
+    } catch (err) {
+        console.log('[Error] ', err);
+        res.status(500).json({
+            error: 500, msg: err.message || 'Error al procesar la solicitud.', 'status': 'error',
+            validateError: err.errors || null
+        });
+    }
+}
+/*-------------------------------------------------------------------------------------------*/
 export default {
     login,
     recovery,
-    newPass
+    newPass,
+    updatePass
 }

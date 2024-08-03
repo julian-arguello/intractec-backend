@@ -97,7 +97,7 @@ function register(req, res) {
                         res.status(500).json({ error: 500, 'status': 'error', msg: err.msg })
                     })
             } else {
-                res.status(400).json({ error: 400, 'status': 'error', msg: "El usario ya existe" })
+                res.status(400).json({ error: 400, 'status': 'error', msg: "El usuario ya existe." })
             }
         })
         .catch((err) => {
