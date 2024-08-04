@@ -27,6 +27,8 @@ export const schemaUserUpdate = yup.object().shape({
     name: yup.string().min(3, 'Este campo debe tener como mínimo tres caracteres.').required('El nombre es obligatorio.'),
     /*------------------------------------------------------------*/
     lastname: yup.string().min(3, 'Este campo debe tener como mínimo tres caracteres.').required('El apellido es obligatorio.'),
+    /*------------------------------------------------------------*/
+    avatar: yup.string().required('El avatar es obligatorio.'),
 }).noUnknown()
 /*-------------------------------------------------------------------------------------------*/
 /**

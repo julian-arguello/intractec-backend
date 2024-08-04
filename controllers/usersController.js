@@ -88,6 +88,7 @@ function register(req, res) {
                 const salt = await bcrypt.genSalt(10);
                 entity.password = await bcrypt.hash(entity.password, salt);
                 entity.softDelete = "false";
+                entity.avatar = "casco-gris";
                 usersDao.insert(entity)
                     .then((user) => {
                         res.status(200).json({ 'status': 'success', msg: 'El usuario fue registrado correctamente.' });
@@ -118,6 +119,7 @@ function update(req, res) {
     const schema = (SA == 'true') ? schemaUserUpdateSA : schemaUserUpdate
     schema.validate(req.body)
         .then(async (entity) => {
+            console.log(entity)
             usersDao.update(req.params.id, entity)
                 .then((user) => {
                     res.status(200).json({ 'status': 'success', msg: 'El usuario fue modificado correctamente.' });
