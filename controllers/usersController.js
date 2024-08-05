@@ -1,7 +1,9 @@
 import usersDao from '../model/users.dao.js';
 import rolesDao from '../model/roles.dao.js';
-import { schemaUserRegister, schemaUserUpdate, schemaUserUpdateSA } from '../services/validate.js';
+import { schemaUserRegister, schemaUserProfileUpdate, schemaUserUpdate } from '../services/validate.js';
 import bcrypt from 'bcrypt';
+import jwtService from './../services/jwt.service.js';
+
 
 /*-------------------------------------------------------------------------------------------*/
 /**
@@ -115,12 +117,44 @@ function register(req, res) {
  * @param {*} res 
  */
 function update(req, res) {
-    let SA = req.header('SA')
-    const schema = (SA == 'true') ? schemaUserUpdateSA : schemaUserUpdate
-    schema.validate(req.body)
+    schemaUserUpdate.validate(req.body)
         .then(async (entity) => {
-            console.log(entity)
             usersDao.update(req.params.id, entity)
+                .then((user) => {
+                    res.status(200).json({ 'status': 'success', msg: 'El usuario fue modificado correctamente.' });
+                })
+                .catch((err) => {
+                    console.log('[Error] ', err);
+                    res.status(500).json({ error: 500, 'status': 'error', msg: err.msg })
+                })
+        })
+        .catch((err) => {
+            res.status(500).json({
+                error: 500, msg: "[Error] ", 'status': 'error', validateError: err.errors
+            })
+        })
+}
+/*-------------------------------------------------------------------------------------------*/
+/**
+ * Modifica los datos del pefilr.
+ * 
+ * @param {*} req 
+ * @param {*} res 
+ */
+function updateProfile(req, res) {
+    const token = req.header('auth-token');
+
+    if (!token) {
+        return res.status(401).json({ error: 401, msg: 'Token de autenticación requerido.' });
+    }
+
+    schemaUserProfileUpdate.validate(req.body)
+        .then(async (entity) => {
+
+            const data = await jwtService.validate(token);
+            const user = await usersDao.findByEmail(data.email);
+
+            usersDao.update(user._id, entity)
                 .then((user) => {
                     res.status(200).json({ 'status': 'success', msg: 'El usuario fue modificado correctamente.' });
                 })
@@ -162,4 +196,5 @@ export default {
     register,
     update,
     deleteEntity,
+    updateProfile
 }

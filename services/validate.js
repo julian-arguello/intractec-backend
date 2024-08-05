@@ -23,7 +23,7 @@ export const schemaUserRegister = yup.object().shape({
 /**
  * Esquema para acatualizar usuario.
  */
-export const schemaUserUpdate = yup.object().shape({
+export const schemaUserProfileUpdate = yup.object().shape({
     name: yup.string().min(3, 'Este campo debe tener como mínimo tres caracteres.').required('El nombre es obligatorio.'),
     /*------------------------------------------------------------*/
     lastname: yup.string().min(3, 'Este campo debe tener como mínimo tres caracteres.').required('El apellido es obligatorio.'),
@@ -43,7 +43,7 @@ export const schemaUserUpdatePassword = yup.object().shape({
 /**
  * Esquema para acatualizar usuario como super admin.
  */
-export const schemaUserUpdateSA = yup.object().shape({
+export const schemaUserUpdate = yup.object().shape({
     name: yup.string().min(3, 'Este campo debe tener como mínimo tres caracteres.').required('El nombre es obligatorio.'),
     /*------------------------------------------------------------*/
     lastname: yup.string().min(3, 'Este campo debe tener como mínimo tres caracteres.').required('El apellido es obligatorio.'),
