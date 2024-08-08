@@ -161,7 +161,7 @@ export function deleteEntity(req, res) {
             await servicesDao.deleteEntityclient(req.params.id)
             clientsDao.deleteEntity(req.params.id)
                 .then((client) => {
-                    res.status(200).json({ 'status': 'succes', msg: 'El cliente fue eliminado correctamente.' });
+                    res.status(200).json({ 'status': 'success', msg: 'El cliente fue eliminado correctamente.' });
                 })
                 .catch((err) => {
                     console.log('[Error] ', err);
